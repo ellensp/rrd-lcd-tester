@@ -5,13 +5,13 @@
 
 //Standard RRD smart controller LCD pins when on a RAMPS 1.4
 
-//lcd pins  
-#define LCD_PINS_RS 16 //[RAMPS14-SMART-ADAPTER]  
-#define LCD_PINS_ENABLE 17 //[RAMPS14-SMART-ADAPTER]  
-#define LCD_PINS_D4 23 //[RAMPS14-SMART-ADAPTER]  
-#define LCD_PINS_D5 25 //[RAMPS14-SMART-ADAPTER]  
-#define LCD_PINS_D6 27 //[RAMPS14-SMART-ADAPTER]  
-#define LCD_PINS_D7 29 //[RAMPS14-SMART-ADAPTER]  
+//lcd pins
+#define LCD_PINS_RS 16 //[RAMPS14-SMART-ADAPTER]
+#define LCD_PINS_ENABLE 17 //[RAMPS14-SMART-ADAPTER]
+#define LCD_PINS_D4 23 //[RAMPS14-SMART-ADAPTER]
+#define LCD_PINS_D5 25 //[RAMPS14-SMART-ADAPTER]
+#define LCD_PINS_D6 27 //[RAMPS14-SMART-ADAPTER]
+#define LCD_PINS_D7 29 //[RAMPS14-SMART-ADAPTER]
 
 //encoder pins
 #define BTN_EN1         31
@@ -67,24 +67,24 @@ byte customChar3[] = {
 
 static void logo_lines() {
   lcd.setCursor(0, 0); lcd.print('\x00'); lcd.print( "------------------" );  lcd.write('\x01');
-  lcd.setCursor(0, 1);                    lcd.print("|  RRD LCD Tester  |");  
+  lcd.setCursor(0, 1);                    lcd.print("|  RRD LCD Tester  |");
   lcd.setCursor(0, 2); lcd.write('\x02'); lcd.print( "------------------" );  lcd.write('\x03');
   }
 
-static void status_line(char *text) {
+static void status_line(const char *text) {
   lcd.setCursor(0, 3); lcd.print("                    "); //clear the status line
-  lcd.setCursor(0, 3); lcd.print(text); 
+  lcd.setCursor(0, 3); lcd.print(text);
   }
 
 static void encoder_status_line(int value) {
   //Serial.println(value);
-  lcd.setCursor(0, 3); lcd.print("Enc:                "); 
-  lcd.setCursor(4, 3); 
-  for (int x=0;x<value;x++) lcd.print("*"); 
+  lcd.setCursor(0, 3); lcd.print("Enc:                ");
+  lcd.setCursor(4, 3);
+  for (int x=0;x<value;x++) lcd.print("*");
   }
 
 
-static void sdcardinfo() { 
+static void sdcardinfo() {
   lcd.clear();
   lcd.setCursor(0, 0); lcd.print("Initializing SD card");
   if (sdcardinit) {
@@ -116,7 +116,7 @@ static void sdcardinfo() {
         volumesize *= sdvolumecc;       // we'll have a lot of clusters
         volumesize /= 2;                           // SD card blocks are always 512 bytes (2 blocks are 1KB)
         volumesize /= 1024;
-        
+
         lcd.setCursor(0, 3); lcd.print("Volume size(Mb):");
         itoa(volumesize, tmp_string, 10);
         lcd.print(tmp_string);
@@ -126,13 +126,13 @@ static void sdcardinfo() {
   }
 }
 
-void setup() {  
+void setup() {
 
 #ifdef DEBUG
   Serial.begin(9600);
   Serial.println("Start:");
 #endif
-  
+
   lcd.begin(screenX, screenX);
   // Print a message to the LCD.
   lcd.createChar(0, customChar0);
@@ -156,10 +156,10 @@ void setup() {
   Serial.print("BTN_EN1:"); Serial.println(digitalRead(BTN_EN1));
   Serial.print("BTN_EN2:"); Serial.println(digitalRead(BTN_EN2));
 #endif
-  //dependion on power on position of encoder adjust encoderPosLast  
+  //dependion on power on position of encoder adjust encoderPosLast
   if (digitalRead(BTN_EN1) && digitalRead(BTN_EN2)) encoderPosLast--;
   else if ((!digitalRead(BTN_EN1) && digitalRead(BTN_EN2)) || (digitalRead(BTN_EN1) && !digitalRead(BTN_EN2))) encoderPosLast++;
-    
+
   logo_lines();
   status_line("Starting...");
   delay(1000);
@@ -182,10 +182,10 @@ void loop() {
     while (!digitalRead(SD_DETECT_PIN));    //wait for sd card to be removed.
     lcd.clear();
     logo_lines();
-    status_line("SD Card Removed"); 
+    status_line("SD Card Removed");
   }
   else {
-    // Read the encoder and update encoderPos    
+    // Read the encoder and update encoderPos
     encoder0PinNow = digitalRead(BTN_EN2);
     if ((encoder0PinALast == LOW) && (encoder0PinNow == HIGH)) {
       if (digitalRead(BTN_EN1) == LOW) {
@@ -206,26 +206,26 @@ void loop() {
 
     //check if both buttons and sound the ebuzzer
     if ( !digitalRead(BTN_ENC) && !digitalRead(KILL_PIN) ) {
-      status_line("Buzzer activated"); 
+      status_line("Buzzer activated");
       digitalWrite(BEEPER_PIN, HIGH);
       while (!digitalRead(BTN_ENC) && !digitalRead(KILL_PIN)); //wait for button release
       digitalWrite(BEEPER_PIN, LOW);
-      status_line("Buzzer deactivated"); 
+      status_line("Buzzer deactivated");
     }
 
     //check encoder button
     if ( !digitalRead(BTN_ENC) && digitalRead(KILL_PIN) ) {
-      status_line("Enc: button pressed"); 
+      status_line("Enc: button pressed");
       //digitalWrite(BEEPER_PIN, HIGH);
       while (!digitalRead(BTN_ENC) && digitalRead(KILL_PIN));
       //digitalWrite(BEEPER_PIN, LOW);
-      status_line("Enc: button released"); 
+      status_line("Enc: button released");
     }
-    //Check Kill Pin 
+    //Check Kill Pin
     if ( !digitalRead(KILL_PIN) && digitalRead(BTN_ENC) )  {
-      status_line("Kill button pressed"); 
+      status_line("Kill button pressed");
       while (!digitalRead(KILL_PIN) && digitalRead(BTN_ENC));
-      status_line("Kill button released"); 
+      status_line("Kill button released");
     }
 
   }
